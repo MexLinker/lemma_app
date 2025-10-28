@@ -20,8 +20,8 @@ build/
 # Environment variables
 .env
 
-# Excel files
-data/excel/*.xlsx
+# # Excel files
+# data/excel/*.xlsx
 
 # Database files
 *.db
