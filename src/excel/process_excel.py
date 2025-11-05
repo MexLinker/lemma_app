@@ -4,9 +4,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from epub.epub_reader import EPUBReader
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+EXCEL_DIR = os.path.join(DATA_DIR, 'excel')
+EPUB_DIR = os.path.join(DATA_DIR, 'epub')
+
 def get_epub_files():
-    epub_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'epub')
-    return [f for f in os.listdir(epub_dir) if f.endswith('.epub')]
+    return [os.path.join(EPUB_DIR, f) for f in os.listdir(EPUB_DIR) if f.lower().endswith('.epub')]
 
 def process_excel_file(excel_path):
     # Read the Excel file
@@ -17,7 +21,8 @@ def process_excel_file(excel_path):
     reader = EPUBReader(epub_files)
     
     # Create new columns for each book
-    for book_name in epub_files:
+    for book_path in epub_files:
+        book_name = os.path.basename(book_path)
         df[book_name] = 'NoWord'  # Default value
     
     # Process each word in the Lemma column
@@ -39,11 +44,11 @@ def process_excel_file(excel_path):
                 df.at[idx, book_name] = result['sentence']
     
     # Save the updated Excel file
-    output_path = 'processed_' + os.path.basename(excel_path)
+    output_path = os.path.join(EXCEL_DIR, 'processed_' + os.path.basename(excel_path))
     df.to_excel(output_path, index=False)
     print(f'\nResults saved to {output_path}')
 
 if __name__ == '__main__':
-    excel_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'excel')
+    excel_dir = EXCEL_DIR
     excel_file = os.path.join(excel_dir, 'enWords_learn_with_freq_win_Oct28.xlsx')
     process_excel_file(excel_file)
