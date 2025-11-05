@@ -41,8 +41,8 @@ async function getLatestTableName() {
 
 async function resolveTableName(query) {
   if (TABLE_NAME_OVERRIDE) return TABLE_NAME_OVERRIDE;
-  if (query?.table) return String(query.table);
-  if (query?.date) return `word_search_${String(query.date)}`;
+  if (query && query.table) return String(query.table);
+  if (query && query.date) return `word_search_${String(query.date)}`;
   return await getLatestTableName();
 }
 
