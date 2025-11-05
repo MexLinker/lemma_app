@@ -1,12 +1,18 @@
 import pandas as pd
 import sys
 import os
+from pathlib import Path
+
+# Ensure we can import sibling modules under src/
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from epub.epub_reader import EPUBReader
 
 def get_epub_files():
-    epub_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'epub')
-    return [f for f in os.listdir(epub_dir) if f.endswith('.epub')]
+    # Resolve project directories cross-platform
+    base_dir = Path(__file__).resolve().parents[2]  # .../lemma_app
+    epub_dir = base_dir / 'data' / 'epub'
+    # Return full paths for EPUB files
+    return [str(p) for p in epub_dir.glob('*.epub')]
 
 def process_excel_file(excel_path):
     # Read the Excel file
@@ -17,7 +23,8 @@ def process_excel_file(excel_path):
     reader = EPUBReader(epub_files)
     
     # Create new columns for each book
-    for book_name in epub_files:
+    for book_path in epub_files:
+        book_name = Path(book_path).name
         df[book_name] = 'NoWord'  # Default value
     
     # Process each word in the Lemma column
@@ -38,12 +45,16 @@ def process_excel_file(excel_path):
                 book_name = result['book_name']
                 df.at[idx, book_name] = result['sentence']
     
-    # Save the updated Excel file
-    output_path = 'processed_' + os.path.basename(excel_path)
+    # Save the updated Excel file under lemma_app/data/excel
+    base_dir = Path(__file__).resolve().parents[2]
+    excel_dir = base_dir / 'data' / 'excel'
+    excel_dir.mkdir(parents=True, exist_ok=True)
+    output_path = excel_dir / f"processed_{Path(excel_path).name}"
     df.to_excel(output_path, index=False)
-    print(f'\nResults saved to {output_path}')
+    print(f"\nResults saved to {output_path}")
 
 if __name__ == '__main__':
-    excel_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'excel')
-    excel_file = os.path.join(excel_dir, 'enWords_learn_with_freq_win_Oct28.xlsx')
-    process_excel_file(excel_file)
+    base_dir = Path(__file__).resolve().parents[2]
+    excel_dir = base_dir / 'data' / 'excel'
+    excel_file = excel_dir / 'enWords_learn_with_freq_win_Oct28.xlsx'
+    process_excel_file(str(excel_file))

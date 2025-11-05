@@ -137,3 +137,20 @@ process_excel_file(excel_file)
 - Single-threaded processing
 - Limited to text-based search
 - Fixed output format
+ 
+## Cross-Platform Notes
+- Paths use `pathlib` for Windows/macOS compatibility.
+- Input Excel files should be placed under `lemma_app/data/excel/`.
+- Processed output is saved to `lemma_app/data/excel/` with `processed_` prefix.
+- EPUB files must be under `lemma_app/data/epub/`.
+
+### Quick Start (Windows/macOS)
+- Run: `python lemma_app/src/excel/process_excel.py`
+- Example snippet:
+```python
+from pathlib import Path
+base_dir = Path(__file__).resolve().parents[2]
+excel_dir = base_dir / 'data' / 'excel'
+excel_file = excel_dir / 'enWords_learn_with_freq_win_Oct28.xlsx'
+process_excel_file(str(excel_file))
+```
